@@ -3,19 +3,20 @@ CREATE DATABASE steam_db DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_c
 USE steam_db
 
 CREATE TABLE User (
-    id int,
+    id bigint,
     display_name varchar(100),
     PRIMARY KEY (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE Game (
     id int,
-    description varchar(200),
+    name varchar(100),
+    description text,
     PRIMARY KEY (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE Recently_Played (
-    id_user int,
+CREATE TABLE Owned_Games (
+    id_user bigint,
     id_game int,
     playtime_2weeks int,
     playtime_forever int,
@@ -27,14 +28,14 @@ CREATE TABLE Recently_Played (
 CREATE TABLE Genres (
     id_game int,
     genre varchar(50),
-    PRIMARY KEY(id_game),
+    PRIMARY KEY(id_game, genre),
     FOREIGN KEY(id_game) REFERENCES Game(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE Developers (
     id_game int,
     developer varchar(50),
-    PRIMARY KEY(id_game),
+    PRIMARY KEY(id_game, developer),
     FOREIGN KEY(id_game) REFERENCES Game(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -42,6 +43,6 @@ CREATE TABLE Developers (
 CREATE TABLE Categories (
     id_game int,
     category varchar(50),
-    PRIMARY KEY(id_game),
+    PRIMARY KEY(id_game, category),
     FOREIGN KEY(id_game) REFERENCES Game(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
