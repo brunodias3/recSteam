@@ -12,6 +12,9 @@ CREATE TABLE Game (
     id int,
     name varchar(100),
     description text,
+    categories text,
+    developers text,
+    genres text,
     PRIMARY KEY (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -25,24 +28,12 @@ CREATE TABLE Owned_Games (
     FOREIGN KEY (id_game) REFERENCES Game(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE Genres (
+CREATE TABLE Recommendation (
+    id_user bigint,
     id_game int,
-    genre varchar(50),
-    PRIMARY KEY(id_game, genre),
-    FOREIGN KEY(id_game) REFERENCES Game(id)
+    evaluation int,
+    PRIMARY KEY (id_user, id_game),
+    FOREIGN KEY (id_user) REFERENCES User(id),
+    FOREIGN KEY (id_game) REFERENCES Game(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE Developers (
-    id_game int,
-    developer varchar(50),
-    PRIMARY KEY(id_game, developer),
-    FOREIGN KEY(id_game) REFERENCES Game(id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
-CREATE TABLE Categories (
-    id_game int,
-    category varchar(50),
-    PRIMARY KEY(id_game, category),
-    FOREIGN KEY(id_game) REFERENCES Game(id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
