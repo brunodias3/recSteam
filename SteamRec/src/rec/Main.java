@@ -30,7 +30,6 @@ public class Main {
 				}
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
 		return playtimes;
@@ -52,14 +51,14 @@ public class Main {
 	}
 	
 	public static void main (String[] args) throws ClassNotFoundException, IOException {
-		Scanner teclado = new Scanner(System.in);
+		Scanner keyboard = new Scanner(System.in);
 		System.out.println("Digite um steam id cadastrado");
-		Long steamid = teclado.nextLong();
-		teclado.close();
+		Long steamid = keyboard.nextLong();
+		keyboard.close();
 		User user = new User(steamid);
-		user.recuperarNome();
-		user.recuperarJogos();
-		List<Game> candidatos = user.recuperarTodosJogos();
+		user.getUserName();
+		user.getUserGames();
+		List<Game> gamesNotOwnedByUser = Game.getNotOwnedGames(user);
 		Similarity similarity = new Similarity();
 		Map<Game, Integer> ownedGames = user.getOwnedGames();
 		List<Game> owned = new ArrayList<Game>();
@@ -72,9 +71,9 @@ public class Main {
 				owned.add(entry.getKey());
 			}
 		}
-		List<String> descCand = new ArrayList<String>();
-		List<String> genCand = new ArrayList<String>();
-		List<String> catCand = new ArrayList<String>();
+		List<String> descCandidates = new ArrayList<String>();
+		List<String> genCandidates = new ArrayList<String>();
+		List<String> catCandidates = new ArrayList<String>();
 		String descOwned = "";
 		String genOwned = "";
 		String catOwned = "";
@@ -83,18 +82,18 @@ public class Main {
 			genOwned += owned.get(i).getGenres() + " ";
 			catOwned += owned.get(i).getCategories() + " ";
 		}
-		for(int i=0; i<candidatos.size(); i++) {
-			descCand.add(candidatos.get(i).getDescription());
-			genCand.add(candidatos.get(i).getGenres());
-			catCand.add(candidatos.get(i).getCategories());
+		for(int i=0; i<gamesNotOwnedByUser.size(); i++) {
+			descCandidates.add(gamesNotOwnedByUser.get(i).getDescription());
+			genCandidates.add(gamesNotOwnedByUser.get(i).getGenres());
+			catCandidates.add(gamesNotOwnedByUser.get(i).getCategories());
 		}
-		List<Double> cosineDesc = similarity.cosineSimilarity(descOwned,descCand);
-		List<Double> cosineGen = similarity.cosineSimilarity(genOwned,genCand);
-		List<Double> cosineCat = similarity.cosineSimilarity(catOwned,catCand);
-		Map<Game, Double> recomendacoes = similarity.allSimilarity(5, candidatos, cosineDesc,cosineGen,cosineCat);
-		for(Map.Entry<Game, Double> entry: recomendacoes.entrySet()) {
+		List<Double> cosineDesc = similarity.cosineSimilarity(descOwned,descCandidates);
+		List<Double> cosineGen = similarity.cosineSimilarity(genOwned,genCandidates);
+		List<Double> cosineCat = similarity.cosineSimilarity(catOwned,catCandidates);
+		Map<Game, Double> recommendations = similarity.allSimilarity(5, gamesNotOwnedByUser, cosineDesc,cosineGen,cosineCat);
+		for(Map.Entry<Game, Double> entry: recommendations.entrySet()) {
 			System.out.println(entry.getKey().getName() + ": " + entry.getValue());
 		}
-		user.registrarRecomendacao(recomendacoes);
+		user.registerRecommendation(recommendations);
 	}
 }

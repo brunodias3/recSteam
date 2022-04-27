@@ -1,8 +1,8 @@
 package models;
 
 import java.sql.*;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Game {
 
@@ -65,7 +65,38 @@ public class Game {
 		this.description = description;
 	}		
 	
-	public void recuperarInformacoes() throws ClassNotFoundException {
+	public static List<Game> getNotOwnedGames(User user) throws ClassNotFoundException{
+		String sql = "SELECT * FROM Game WHERE ";
+		List<Game> games = new ArrayList<Game>();
+		List<Game> owned = new ArrayList<Game>(user.getOwnedGames().keySet());
+		for(int i=0; i<owned.size(); i++) {
+			if(i == 0) {
+				sql += "Game.id != " + Integer.toString(owned.get(i).getGameId());
+			}
+			else {
+				sql += " AND Game.id != " + Integer.toString(owned.get(i).getGameId());
+			}
+		}
+		try {
+			Connection con = new DataGetter().getConnection();
+			PreparedStatement stmt = con.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+			int gameid;
+			while(rs.next()) {
+				gameid = rs.getInt("id");
+				Game game = new Game(gameid);
+				game.getGameInfo();
+				games.add(game);
+			}
+			con.close();
+			stmt.close();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return games;		
+	}
+	
+	public void getGameInfo() throws ClassNotFoundException {
 		String sql = "SELECT * FROM Game WHERE id = " + Integer.toString(this.gameId);
 		try {
 			Connection con = new DataGetter().getConnection();			
@@ -82,7 +113,6 @@ public class Game {
 				System.out.println("Não existe um jogo com esse id no banco.");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}	

@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class User {
 		this.recommendations = recommendations;
 	}	
 	
-	public boolean recuperarNome() throws ClassNotFoundException {
+	public boolean getUserName() throws ClassNotFoundException {
 		String sql = "SELECT display_name FROM User WHERE id = " + Long.toString(this.id);
 		try {
 			Connection con = new DataGetter().getConnection();			
@@ -60,13 +59,12 @@ public class User {
 				System.out.println("Não existe um usuário com esse id no banco.");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
 	}
 	
-	public void recuperarJogos() throws ClassNotFoundException {
+	public void getUserGames() throws ClassNotFoundException {
 		String sql = "SELECT Owned_Games.id_game, Owned_Games.playtime_2weeks FROM Owned_Games" + 
 						" WHERE Owned_Games.id_user = " + Long.toString(this.id);
 		Map<Game, Integer> games = new HashMap<Game, Integer>();		
@@ -79,7 +77,7 @@ public class User {
 				gameid = rs.getInt("id_game");
 				playtime = rs.getInt("playtime_2weeks");
 				Game game = new Game(gameid);
-				game.recuperarInformacoes();
+				game.getGameInfo();
 				games.put(game, playtime);
 			}
 			this.setOwnedGames(games);
@@ -90,38 +88,7 @@ public class User {
 		}
 	}
 	
-	public List<Game> recuperarTodosJogos() throws ClassNotFoundException{
-		String sql = "SELECT * FROM Game WHERE ";
-		List<Game> games = new ArrayList<Game>();
-		List<Game> owned = new ArrayList<Game>(this.ownedGames.keySet());
-		for(int i=0; i<owned.size(); i++) {
-			if(i == 0) {
-				sql += "Game.id != " + Integer.toString(owned.get(i).getGameId());
-			}
-			else {
-				sql += " AND Game.id != " + Integer.toString(owned.get(i).getGameId());
-			}
-		}
-		try {
-			Connection con = new DataGetter().getConnection();
-			PreparedStatement stmt = con.prepareStatement(sql);
-			ResultSet rs = stmt.executeQuery();
-			int gameid;
-			while(rs.next()) {
-				gameid = rs.getInt("id");
-				Game game = new Game(gameid);
-				game.recuperarInformacoes();
-				games.add(game);
-			}
-			con.close();
-			stmt.close();
-		} catch(SQLException e) {
-			e.printStackTrace();
-		}
-		return games;		
-	}
-	
-	public void registrarRecomendacao(Map<Game, Double> recomendacoes) throws ClassNotFoundException {
+	public void registerRecommendation(Map<Game, Double> recomendacoes) throws ClassNotFoundException {
 		String sql = "INSERT INTO Recommendation VALUES";
 		String del = "DELETE FROM Recommendation WHERE id_user = " + Long.toString(this.getId());
 		for(Map.Entry<Game, Double> entry: recomendacoes.entrySet()) {
