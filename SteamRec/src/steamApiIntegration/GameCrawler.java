@@ -1,6 +1,7 @@
 package steamApiIntegration;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -95,12 +96,13 @@ public class GameCrawler {
 	    JSONArray gamesArray = allGamesJsonList.getJSONArray("apps");
 	    int gamesCrawled = 0;
 	    for(int i = 0; i < gamesArray.length(); i++) {
-	    	gamesCrawled++;
+	    	try {
 	    	JSONObject game = gamesArray.getJSONObject(i);
 	    	int gameId = game.getInt("appid");
 	    	if(isGameRegistered(gameId)) {
 	    		System.out.println("Game " + gameId + " already registered");
 	    	} else { 
+		    	gamesCrawled++;	    		
 		    	JSONObject gameDetails = apiReader.readJsonFromUrl("https://store.steampowered.com/api/appdetails?appids=".concat(String.valueOf(gameId)));
 		    	gameDetails = gameDetails.getJSONObject(String.valueOf(gameId));
 		    	if(gameDetails.getBoolean("success")) {
@@ -109,13 +111,12 @@ public class GameCrawler {
 		    	}
 	    	}
 	    	if(gamesCrawled == 150) {
-		    	try {
-					Thread.sleep(5 * 60 * 1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				Thread.sleep(5 * 60 * 1000);
 		    	gamesCrawled = 0;
 	    	}	    	
+	    } catch (UnknownHostException | InterruptedException e) {
+	    	e.printStackTrace();
 	    }
 	  }
+  }
 }
