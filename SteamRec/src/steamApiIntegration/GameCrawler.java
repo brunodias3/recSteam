@@ -12,18 +12,30 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
-import models.DataGetter;
+import db.DataGetter;
 
 public class GameCrawler {
 	  
 	  public static void saveGameData(JSONObject gameData, int gameId) {
 		  try {
 			  String insertGame = "INSERT INTO Game VALUES ";
+			  
 			  String gameDescription = (Jsoup.parse(gameData.getString("detailed_description")).text()).replace('\'', '’').replace('\"', '’');
 			  insertGame += "(" + String.valueOf(gameId) + ", \"" + gameData.getString("name").replace('\'', '’').replace('\"', '’') + "\", \"" + gameDescription + "\", ";
-			  JSONArray gameCategoriesJson = gameData.getJSONArray("categories");
-			  JSONArray gameGenresJson = gameData.getJSONArray("genres");
-			  JSONArray gameDevelopersJson = gameData.getJSONArray("developers");
+			  
+			  JSONArray gameCategoriesJson = new JSONArray();
+			  JSONArray gameGenresJson = new JSONArray();
+			  JSONArray gameDevelopersJson = new JSONArray();
+			  if(gameData.has("categories")) {
+				  gameCategoriesJson = gameData.getJSONArray("categories");				  
+			  }
+			  if(gameData.has("genres")) {
+				  gameGenresJson = gameData.getJSONArray("genres");
+			  }
+			  if(gameData.has("developers")) {
+				  gameDevelopersJson = gameData.getJSONArray("developers");
+			  }
+			  
 			  String gameCategories = "\"";
 			  for(int i = 0; i < gameCategoriesJson.length(); i++) {
 				  gameCategories += (gameCategoriesJson.getJSONObject(i)).getString("description").replace('\'', '’').replace('\"', '’');
@@ -33,6 +45,10 @@ public class GameCrawler {
 					  gameCategories += "\"";
 				  }
 			  }
+			  if(gameCategoriesJson.length() == 0) {
+				  gameCategories += "\"";				  
+			  }
+			  
 			  String gameDevelopers = "\"";
 			  for(int i = 0; i < gameDevelopersJson.length(); i++) {
 				  gameDevelopers += (gameDevelopersJson.getString(i)).replace('\'', '’').replace('\"', '’');
@@ -42,6 +58,10 @@ public class GameCrawler {
 					  gameDevelopers += "\"";
 				  }
 			  }
+			  if(gameDevelopersJson.length() == 0) {
+				  gameDevelopers += "\"";				  
+			  }			  
+			  
 			  String gameGenres = "\"";
 			  for(int i = 0; i < gameGenresJson.length(); i++) {
 				  gameGenres += (gameGenresJson.getJSONObject(i)).getString("description").replace('\'', '’').replace('\"', '’');
@@ -51,6 +71,10 @@ public class GameCrawler {
 					  gameGenres += "\"";
 				  }
 			  }
+			  if(gameGenresJson.length() == 0) {
+				  gameGenres += "\"";				  
+			  }
+			  
 			  insertGame += gameCategories + ", " + gameDevelopers + ", " + gameGenres + ")";
 			  try {
 				 Connection con = new DataGetter().getConnection(); 
@@ -113,7 +137,7 @@ public class GameCrawler {
 	    	if(gamesCrawled == 150) {
 				Thread.sleep(5 * 60 * 1000);
 		    	gamesCrawled = 0;
-	    	}	    	
+			}
 	    } catch (UnknownHostException | InterruptedException e) {
 	    	e.printStackTrace();
 	    }

@@ -13,7 +13,7 @@ import org.json.JSONObject;
 
 public class JsonReader {
   
-  public String steamApiAccessKey = "CC75C41B50F1A4EC9F0A4A7F1EA8B29A";
+  public String steamApiAccessKey = "39BD7771BAE2F331D232450661FDE49F";
 
   
   private static String readAll(Reader rd) throws IOException {

@@ -1,4 +1,4 @@
-package models;
+package db;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import com.mysql.jdbc.Connection;
 
 public class DataGetter {
+	
 	private String dbPassword;
 	private String dbUser;
 	

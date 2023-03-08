@@ -1,3 +1,4 @@
-/steamApiIntegration/
-/models/
+/db/
+/entities/
 /rec/
+/steamApiIntegration/
